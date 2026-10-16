@@ -2,6 +2,22 @@
 
 English below each version, then Spanish. · En cada versión, primero inglés y después español.
 
+## 0.2.0 · 2026-10-16
+
+- The permissions screen no longer closes as soon as file access is given. It shows the three permissions with their state and goes away when you tap **Continue** (enabled once file access is there) or when all three are given. Battery and display over other apps can be skipped and given later from the new key button at the top right, next to the log.
+- Each permission says where to tap when the phone opens its own page: **No restrictions** on the battery page of Xiaomi / HyperOS, and Mr. Bin in the list of apps for display over other apps.
+- New icon from the Mr. Bin artwork: Mr. Bin holding up the glowing .BIN file, teddy in his pocket, on navy with a violet glow. Same art in the themed (monochrome) icon, as line art, and on the Extract tab. `art/icon.py` cuts every icon from `art/source/mrbin-art.jpg`. The notification icon stays a line drawing made for 24 dp.
+- New palette from the artwork: deep navy surfaces, violet glow around the main action, the neon green of the .BIN file for actions and the yellow of the logo for labels. Main buttons and the progress bar use the yellow → green of the logo. Every text pair stays at 4.5:1 or more.
+- The README shows the artwork.
+
+**Español**
+
+- La pantalla de permisos ya no se cierra apenas das el acceso a archivos. Muestra los tres permisos con su estado y se quita cuando tocas **Continuar** (se activa con el acceso a archivos) o cuando los tres están dados. Batería y mostrar sobre otras apps se pueden saltar y dar después con el botón nuevo de la llave, arriba a la derecha, junto al registro.
+- Cada permiso dice dónde tocar cuando el celular abre su propia pantalla: **Sin restricciones** en la de batería de Xiaomi / HyperOS, y Mr. Bin en la lista de apps para mostrar sobre otras apps.
+- Ícono nuevo sacado del arte de Mr. Bin: Mr. Bin levanta el archivo .BIN que brilla, con el osito en el bolsillo, sobre azul oscuro con brillo violeta. El mismo arte en el ícono temático (monocromo), como dibujo de líneas, y en la pestaña Extraer. `art/icon.py` saca todos los íconos de `art/source/mrbin-art.jpg`. El de la notificación sigue siendo un dibujo de líneas hecho para 24 dp.
+- Paleta nueva sacada del arte: fondos azul muy oscuro, brillo violeta alrededor de la acción principal, el verde neón del archivo .BIN para las acciones y el amarillo del logo para las etiquetas. Los botones principales y la barra de avance usan el amarillo → verde del logo. Todos los textos siguen en 4.5:1 o más.
+- El README muestra el arte.
+
 ## 0.1.0 · 2026-10-16
 
 First public version.

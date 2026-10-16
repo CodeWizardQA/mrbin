@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * The app's icons, drawn in code on a 64×64 grid (no image files, no emoji): lime and mustard from
  * {@link Palette}, green for done and red for stop. The one exception is {@link #MR_BIN}, Mr. Bin's face,
- * which comes from drawable/ic_glyph.xml so it stays the same drawing as the launcher icon (art/icon.py).
+ * which is drawable-nodpi/ic_glyph.png, cut from the same artwork as the launcher icon by art/icon.py.
  * Bitmaps are cached per type and size.
  */
 public final class Icons {
@@ -77,7 +77,7 @@ public final class Icons {
         return new BitmapDrawable(ctx.getResources(), bmp);
     }
 
-    /** Mr. Bin's face in the theme colors: lime lines and a red tie. */
+    /** Mr. Bin's face, from the artwork. */
     private static Bitmap renderGlyph(Context ctx, int sizePx) {
         Bitmap bmp = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888);
         Drawable glyph = ctx.getDrawable(R.drawable.ic_glyph);

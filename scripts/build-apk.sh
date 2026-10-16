@@ -6,8 +6,8 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 # Version: change it only here. The app reads it from the APK for the header and the log.
 # VERSION_CODE must always go up, or Android refuses to install the new version over the old one.
-VERSION_CODE=1
-VERSION_NAME="0.1.0"
+VERSION_CODE=2
+VERSION_NAME="0.2.0"
 APP_ID="mrbin"
 APK_NAME="$APP_ID-$VERSION_NAME.apk"
 SDK_DIR="${ANDROID_SDK_DIR:-/opt/homebrew/share/android-commandlinetools}"

@@ -25,6 +25,18 @@
     <string name="onb_overlay_body">Shows the percentage around the front camera while extracting.</string>
     <string name="onb_overlay_btn">Allow display over other apps</string>
     <string name="onb_overlay_done">Allowed</string>
+    <string name="onb_intro">Only the first one is required. The other two are up to you, and you can change all three later with the key button at the top right.</string>
+    <string name="onb_storage_done">File access allowed</string>
+    <string name="onb_battery_hint">If the phone opens its own battery page, choose “No restrictions”.</string>
+    <string name="onb_overlay_hint">If a list of apps opens, find %1$s in it and turn it on.</string>
+    <string name="onb_count">%1$d of %2$d allowed</string>
+    <string name="onb_bar_hint">You can change them later with the key button</string>
+    <string name="onb_bar_locked">File access is needed to continue</string>
+    <string name="onb_continue">Continue</string>
+
+    <!-- Permissions page (key button of the header) -->
+    <string name="perm_title">Permissions</string>
+    <string name="perm_subtitle">Give the ones you skipped, whenever you want</string>
 
     <!-- Extract tab -->
     <string name="source_label">PKG folder</string>

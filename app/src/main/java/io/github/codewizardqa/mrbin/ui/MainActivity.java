@@ -54,7 +54,8 @@ import java.util.Locale;
 
 /**
  * Extracts a PS4 fake PKG (fPKG) into the game folder (eboot.bin, sce_sys, sce_module, …) with the engine ported
- * from shadPS4 and LibOrbisPkg. Two tabs (Extract, Results) and the log behind a small button at the top right.
+ * from shadPS4 and LibOrbisPkg. Two tabs (Extract, Results); the permissions and the log behind two small buttons
+ * at the top right.
  * The screen only shows what the engine really read or wrote. Every view is built in code; colors come from
  * {@link Palette} and every text from res/values*\/strings.xml.
  */
@@ -72,6 +73,8 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
     private int currentTab = TAB_EXTRACT;
     /** The log is a page of its own on top of the current tab; back returns to the tab. */
     private boolean showingLog = false;
+    /** The permissions page, opened from the key button of the header; works like the log page. */
+    private boolean showingPermissions = false;
     private boolean storageGranted = false;
     private boolean batteryGranted = false;
     private boolean overlayGranted = false;
@@ -163,6 +166,8 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
         super.onResume();
         app.engine.addListener(this);
         refreshPermissionsState();
+        // Nothing left to choose: the first-start screen goes away by itself.
+        if (storageGranted && batteryGranted && overlayGranted) app.settings.setSetupDone(true);
         if (storageGranted && !app.engine.getProgress().running) {
             app.engine.scanSourceFolder(null);
         }
@@ -180,6 +185,10 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
     public void onBackPressed() {
         if (showingLog) {
             closeLog();
+            return;
+        }
+        if (showingPermissions && !inSetup()) {
+            closePermissions();
             return;
         }
         super.onBackPressed();
@@ -204,7 +213,8 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
 
     private void updateOrRebuildUi() {
         // The log page is a snapshot taken when it opens; the engine does not redraw it under the user's finger.
-        if (showingLog) return;
+        // The permissions page only changes when the user comes back from the system settings (onResume).
+        if (showingLog || showingPermissions || inSetup()) return;
         ActiveConversionProgress p = app.engine.getProgress();
         if (storageGranted && currentTab == TAB_EXTRACT && liveDashboardBox != null && p.running && lastRunning) {
             bindLiveProgressViews(p);
@@ -223,6 +233,24 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
         rebuildScreen();
     }
 
+    private void openPermissions() {
+        showingPermissions = true;
+        rebuildScreen();
+    }
+
+    private void closePermissions() {
+        showingPermissions = false;
+        rebuildScreen();
+    }
+
+    /**
+     * First start, or file access taken away later in the system settings: the permissions page is the whole app
+     * until file access is there and the user taps Continue (or grants all three).
+     */
+    private boolean inSetup() {
+        return !storageGranted || !app.settings.isSetupDone();
+    }
+
     private void rebuildScreen() {
         contentContainer.removeAllViews();
         bottomNav.removeAllViews();
@@ -232,9 +260,9 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
         livePauseBtn = null;
         lastRunning = app.engine.getProgress().running;
 
-        if (!storageGranted) {
+        if (inSetup() || showingPermissions) {
             showBottomNav(false);
-            buildOnboardingView();
+            buildPermissionsPage(inSetup());
             return;
         }
         if (showingLog) {
@@ -294,8 +322,8 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
 
     // ------------------------------------------------------------------------------------------- header
 
-    /** App icon, a title and a line under it; the small log button sits at the right when {@code withLog}. */
-    private void addAppHeader(String title, String subtitle, boolean withLog) {
+    /** App icon, a title and a line under it; the permissions and log buttons sit at the right when {@code withButtons}. */
+    private void addAppHeader(String title, String subtitle, boolean withButtons) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
@@ -324,49 +352,147 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
         col.addView(s);
         row.addView(col);
 
-        if (withLog) {
+        if (withButtons) {
+            View permBtn = iconButton(Icons.CRYPTO_KEY, getString(R.string.perm_title));
+            permBtn.setOnClickListener(v -> openPermissions());
+            row.addView(permBtn, new LinearLayout.LayoutParams(dp(40), dp(40)));
             View logBtn = iconButton(Icons.LOG_LIST, getString(R.string.log_title));
             logBtn.setOnClickListener(v -> openLog());
-            row.addView(logBtn, new LinearLayout.LayoutParams(dp(40), dp(40)));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(40), dp(40));
+            lp.leftMargin = dp(8);
+            row.addView(logBtn, lp);
         }
         contentContainer.addView(row);
     }
 
-    // --------------------------------------------------------------------------------------- onboarding
+    /** Back button, a title and a line under it: the header of the pages on top of a tab (log, permissions). */
+    private void addPageHeader(String title, String subtitle, Runnable onBack) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(0, 0, 0, dp(16));
+        View back = iconButton(Icons.BACK, getString(R.string.back));
+        back.setOnClickListener(v -> onBack.run());
+        row.addView(back, new LinearLayout.LayoutParams(dp(40), dp(40)));
+        LinearLayout col = new LinearLayout(this);
+        col.setOrientation(LinearLayout.VERTICAL);
+        col.setPadding(dp(12), 0, 0, 0);
+        TextView t = new TextView(this);
+        t.setText(title);
+        t.setTextColor(Palette.TEXT);
+        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        t.setTypeface(Typeface.DEFAULT_BOLD);
+        col.addView(t);
+        TextView s = new TextView(this);
+        s.setText(subtitle);
+        s.setTextColor(Palette.TEXT_3);
+        s.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        col.addView(s);
+        row.addView(col);
+        contentContainer.addView(row);
+    }
 
-    private void buildOnboardingView() {
+    // -------------------------------------------------------------------------------------- permissions
+
+    /**
+     * The three permissions, each with its state. In {@code setup} (first start) it is the whole app, with Continue
+     * in the bottom bar once file access is there; the optional ones can be skipped. Later the same page opens from
+     * the key button of the header, so a permission skipped at the start can still be given.
+     */
+    private void buildPermissionsPage(boolean setup) {
         String appName = getString(R.string.app_name);
-        addAppHeader(appName, getString(R.string.onb_subtitle), false);
+        if (setup) {
+            addAppHeader(appName, getString(R.string.onb_subtitle), false);
+            TextView intro = new TextView(this);
+            intro.setText(getString(R.string.onb_intro));
+            intro.setTextColor(Palette.TEXT_2);
+            intro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            intro.setLineSpacing(dp(2), 1f);
+            contentContainer.addView(intro, bottomMarginLp(14));
+        } else {
+            addPageHeader(getString(R.string.perm_title), getString(R.string.perm_subtitle), this::closePermissions);
+        }
 
-        LinearLayout card1 = createCard(Palette.GLOW, Palette.GLOW_BORDER);
+        LinearLayout card1 = createCard(storageGranted ? Palette.SURFACE : Palette.GLOW,
+                storageGranted ? Palette.BORDER : Palette.GLOW_BORDER);
         addCardTitleWithIcon(card1, getString(R.string.onb_storage_title), Icons.FOLDER_IN);
         addBodyText(card1, getString(R.string.onb_storage_body, appName));
-        Button btnStorage = createPrimaryButton(getString(R.string.onb_storage_btn));
-        btnStorage.setOnClickListener(v -> requestAllFilesAccess());
-        card1.addView(btnStorage, topMarginLp(14));
+        if (storageGranted) {
+            card1.addView(createDoneButton(getString(R.string.onb_storage_done)), topMarginLp(12));
+        } else {
+            Button btnStorage = createPrimaryButton(getString(R.string.onb_storage_btn));
+            btnStorage.setOnClickListener(v -> requestAllFilesAccess());
+            card1.addView(btnStorage, topMarginLp(14));
+        }
         contentContainer.addView(card1, bottomMarginLp(12));
 
         LinearLayout card2 = createCard(Palette.SURFACE, Palette.BORDER);
         addCardTitleWithIcon(card2, getString(R.string.onb_battery_title), Icons.BOLT_TURBO);
         addBodyText(card2, getString(R.string.onb_battery_body));
-        Button btnBatt = createSecondaryButton(
-                getString(batteryGranted ? R.string.onb_battery_done : R.string.onb_battery_btn),
-                batteryGranted ? Icons.CHECK_VERIFIED : 0);
-        setEnabledLook(btnBatt, !batteryGranted);
-        btnBatt.setOnClickListener(v -> requestIgnoreBatteryOptimizations());
-        card2.addView(btnBatt, topMarginLp(12));
+        if (batteryGranted) {
+            card2.addView(createDoneButton(getString(R.string.onb_battery_done)), topMarginLp(12));
+        } else {
+            addHintText(card2, getString(R.string.onb_battery_hint));
+            Button btnBatt = createSecondaryButton(getString(R.string.onb_battery_btn), 0);
+            btnBatt.setOnClickListener(v -> requestIgnoreBatteryOptimizations());
+            card2.addView(btnBatt, topMarginLp(12));
+        }
         contentContainer.addView(card2, bottomMarginLp(12));
 
         LinearLayout card3 = createCard(Palette.SURFACE, Palette.BORDER);
         addCardTitleWithIcon(card3, getString(R.string.onb_overlay_title), Icons.CPU_CHIP);
         addBodyText(card3, getString(R.string.onb_overlay_body));
-        Button btnOverlay = createSecondaryButton(
-                getString(overlayGranted ? R.string.onb_overlay_done : R.string.onb_overlay_btn),
-                overlayGranted ? Icons.CHECK_VERIFIED : 0);
-        setEnabledLook(btnOverlay, !overlayGranted);
-        btnOverlay.setOnClickListener(v -> requestOverlayPermission());
-        card3.addView(btnOverlay, topMarginLp(12));
+        if (overlayGranted) {
+            card3.addView(createDoneButton(getString(R.string.onb_overlay_done)), topMarginLp(12));
+        } else {
+            addHintText(card3, getString(R.string.onb_overlay_hint, appName));
+            Button btnOverlay = createSecondaryButton(getString(R.string.onb_overlay_btn), 0);
+            btnOverlay.setOnClickListener(v -> requestOverlayPermission());
+            card3.addView(btnOverlay, topMarginLp(12));
+        }
         contentContainer.addView(card3, bottomMarginLp(12));
+
+        if (setup) buildSetupBar();
+    }
+
+    /** How many are given, and Continue: enabled once file access is there, the other two are the user's choice. */
+    private void buildSetupBar() {
+        int granted = (storageGranted ? 1 : 0) + (batteryGranted ? 1 : 0) + (overlayGranted ? 1 : 0);
+        LinearLayout col = new LinearLayout(this);
+        col.setOrientation(LinearLayout.VERTICAL);
+        col.setPadding(0, 0, dp(12), 0);
+        TextView t = new TextView(this);
+        t.setText(getString(R.string.onb_count, granted, 3));
+        t.setTextColor(Palette.TEXT);
+        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        t.setTypeface(Typeface.DEFAULT_BOLD);
+        t.setMaxLines(1);
+        t.setEllipsize(TextUtils.TruncateAt.END);
+        col.addView(t);
+        TextView s = new TextView(this);
+        s.setText(getString(storageGranted ? R.string.onb_bar_hint : R.string.onb_bar_locked));
+        s.setTextColor(Palette.TEXT_3);
+        s.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        s.setPadding(0, dp(2), 0, 0);
+        col.addView(s);
+        actionBar.addView(col, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
+        Button go = createPrimaryButton(getString(R.string.onb_continue));
+        go.setMinWidth(dp(124));
+        go.setMinimumWidth(dp(124));
+        go.setMinHeight(dp(48));
+        go.setMinimumHeight(dp(48));
+        go.setPadding(dp(20), dp(8), dp(20), dp(8));
+        setEnabledLook(go, storageGranted);
+        go.setOnClickListener(v -> {
+            app.settings.setSetupDone(true);
+            showingPermissions = false;
+            currentTab = TAB_EXTRACT;
+            rebuildScreen();
+        });
+        actionBar.addView(go, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        actionBarBox.setVisibility(View.VISIBLE);
     }
 
     // -------------------------------------------------------------------------------------- Extract tab
@@ -744,7 +870,7 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
         livePercentTv.setText(p.batchPercentInt() + "%");
         livePercentTv.setTextColor(accent);
         liveProgressBar.setProgress(Math.round(p.batchProgressFloat() * 1000f));
-        // No tint keeps the molten gradient of roundedBar(); a tint paints the whole bar in one color.
+        // No tint keeps the gradient of roundedBar(); a tint paints the whole bar in one color.
         liveProgressBar.setProgressTintList(p.paused ? ColorStateList.valueOf(Palette.COOL)
                 : p.phase == ConversionPhase.ERROR ? ColorStateList.valueOf(Palette.DANGER)
                 : p.phase == ConversionPhase.DONE ? ColorStateList.valueOf(Palette.SUCCESS)
@@ -777,7 +903,7 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
         }
     }
 
-    /** Progress bar with round ends: dark track and a molten gradient that the progress clips from the left. */
+    /** Progress bar with round ends: dark track and the logo gradient, which the progress clips from the left. */
     private Drawable roundedBar() {
         GradientDrawable track = new GradientDrawable();
         track.setColor(Palette.SURFACE_2);
@@ -902,29 +1028,7 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
 
     private void buildLogPage() {
         String appName = getString(R.string.app_name);
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(0, 0, 0, dp(16));
-        View back = iconButton(Icons.BACK, getString(R.string.back));
-        back.setOnClickListener(v -> closeLog());
-        row.addView(back, new LinearLayout.LayoutParams(dp(40), dp(40)));
-        LinearLayout col = new LinearLayout(this);
-        col.setOrientation(LinearLayout.VERTICAL);
-        col.setPadding(dp(12), 0, 0, 0);
-        TextView t = new TextView(this);
-        t.setText(R.string.log_title);
-        t.setTextColor(Palette.TEXT);
-        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        t.setTypeface(Typeface.DEFAULT_BOLD);
-        col.addView(t);
-        TextView s = new TextView(this);
-        s.setText(getString(R.string.log_subtitle, appName));
-        s.setTextColor(Palette.TEXT_3);
-        s.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        col.addView(s);
-        row.addView(col);
-        contentContainer.addView(row);
+        addPageHeader(getString(R.string.log_title), getString(R.string.log_subtitle, appName), this::closeLog);
 
         String log = app.engine.readLogTail(60_000);
 
@@ -1078,6 +1182,17 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
         card.addView(tv);
     }
 
+    /** A smaller line for "where to tap" help under the body of a card. */
+    private void addHintText(LinearLayout card, String text) {
+        TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextColor(Palette.TEXT_3);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tv.setLineSpacing(dp(1), 1f);
+        tv.setPadding(0, dp(6), 0, 0);
+        card.addView(tv);
+    }
+
     private void addDivider(LinearLayout card) {
         View v = new View(this);
         v.setBackgroundColor(Palette.BORDER);
@@ -1087,7 +1202,7 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
         card.addView(v, lp);
     }
 
-    /** The one call to action of a screen: molten gradient, dark text. */
+    /** The one call to action of a screen: the yellow → green gradient of the logo, dark text. */
     private Button createPrimaryButton(String text) {
         Button b = baseButton(text, Palette.ON_ACCENT, 15);
         GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
@@ -1106,6 +1221,16 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
             b.setCompoundDrawablePadding(dp(8));
         }
         b.setBackground(ripple(rounded(Palette.SURFACE_2, 12, Palette.BORDER)));
+        return b;
+    }
+
+    /** A permission that is already given: green check, not tappable, but not dimmed like a disabled button. */
+    private Button createDoneButton(String text) {
+        Button b = baseButton(text, Palette.SUCCESS, 13);
+        b.setCompoundDrawablesRelativeWithIntrinsicBounds(Icons.drawable(this, Icons.CHECK_VERIFIED, 16), null, null, null);
+        b.setCompoundDrawablePadding(dp(8));
+        b.setBackground(rounded(Palette.SUCCESS_BG, 12, 0));
+        b.setEnabled(false);
         return b;
     }
 
@@ -1251,6 +1376,7 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
         }
     }
 
+    /** Xiaomi / HyperOS answer this with their own battery page, where the right choice is "No restrictions". */
     @SuppressLint("BatteryLife")
     private void requestIgnoreBatteryOptimizations() {
         try {
@@ -1258,17 +1384,33 @@ public final class MainActivity extends Activity implements PkgConverterEngine.L
                     Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
                     Uri.parse("package:" + getPackageName())
             ));
-        } catch (Throwable ignored) {
+        } catch (Throwable e) {
+            openSettingsOrApp(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
         }
     }
 
+    /** Since Android 11 the system ignores the package and shows the list of all apps; the card says so. */
     private void requestOverlayPermission() {
         try {
             startActivity(new Intent(
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName())
             ));
-        } catch (Throwable ignored) {
+        } catch (Throwable e) {
+            openSettingsOrApp(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION));
+        }
+    }
+
+    /** The page asked for, or the app's own page in the system settings when this phone has no such page. */
+    private void openSettingsOrApp(Intent intent) {
+        try {
+            startActivity(intent);
+        } catch (Throwable e) {
+            try {
+                startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:" + getPackageName())));
+            } catch (Throwable ignored) {
+            }
         }
     }
 }

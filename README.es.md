@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/icon.png" width="160" alt="Mr. Bin, el ícono de la app: un señor de caricatura con saco de tweed y corbata roja delgada, una ceja levantada, sobre fondo verde lima"></p>
+<p align="center"><img src="docs/icon.png" width="160" alt="Mr. Bin, el ícono de la app: un señor de caricatura despeinado y con una ceja levantada, saco de tweed y corbata roja delgada, que levanta un archivo .BIN verde brillante sobre un fondo azul oscuro y violeta"></p>
 
 <h1 align="center">Mr. Bin</h1>
 
@@ -6,11 +6,13 @@
 
 <p align="center"><a href="README.md">English</a> · <b>Español</b></p>
 
+<p align="center"><img src="art/source/mrbin-art.jpg" width="720" alt="Mr. Bin echa una caja fPKG en una caneca llena de binario y levanta el .BIN que sale, con un osito de peluche en el bolsillo"></p>
+
 App de Android que desempaca un **PKG de PS4 falso (fPKG)** a la carpeta del juego (`<ID del juego>/eboot.bin`, `sce_sys/`, `sce_module/` y el resto del juego) en el mismo celular, sin computadora. Funciona en cualquier celular o tablet con **Android 11 o más nuevo**, en español o en inglés.
 
 Por qué el nombre: la app convierte un `.pkg` en la carpeta que arranca desde `eboot.bin`, y Mr. Bin es el señor quisquilloso del saco de tweed que lo hace por ti, con una ceja levantada.
 
-**Estado:** 0.1.0, la primera versión pública. El motor que extrae se probó con el fPKG de un juego real, partes comprimidas (PFSC) incluidas, en un POCO F9 Ultra con HyperOS. En otros celulares todavía no se ha probado: si la usas en otro, cuéntanos cómo te fue en un [issue](https://github.com/CodeWizardQA/mrbin/issues).
+**Estado:** 0.2.0 (qué cambió: [CHANGELOG](CHANGELOG.md)). El motor que extrae se probó con el fPKG de un juego real, partes comprimidas (PFSC) incluidas, en un POCO F9 Ultra con HyperOS. En otros celulares todavía no se ha probado: si la usas en otro, cuéntanos cómo te fue en un [issue](https://github.com/CodeWizardQA/mrbin/issues).
 
 - Lee los `.pkg` de una carpeta y dice de cada uno qué es antes de tocar nada: fPKG, PKG de tienda, PKG de PS3, no es un PKG, o está incompleto o dañado.
 - Extrae los fPKG que marques, uno tras otro, en segundo plano y con la pantalla apagada.
@@ -36,10 +38,10 @@ El certificado de firma oficial tiene este SHA-256 (se ve con `apksigner verify 
 
 ## Uso
 
-1. Da los permisos de la primera pantalla:
+1. La primera pantalla muestra tres permisos. Solo el primero es obligatorio: da los otros si los quieres y toca **Continuar**. Cualquiera se puede cambiar después con el botón de la llave, arriba a la derecha.
    1. **Acceso a archivos** (obligatorio): «Acceso a todos los archivos», para leer el `.pkg` y escribir la carpeta del juego.
-   2. **Sin límite de batería** (recomendado): evita que el sistema (HyperOS, One UI, ColorOS…) corte la extracción de un juego grande con la pantalla apagada.
-   3. **Mostrar sobre otras apps** (opcional): la cápsula con el porcentaje junto a la cámara frontal. Si el celular no tiene recorte de cámara, sale arriba al centro.
+   2. **Sin límite de batería** (recomendado): evita que el sistema (HyperOS, One UI, ColorOS…) corte la extracción de un juego grande con la pantalla apagada. En Xiaomi / HyperOS el celular abre su propia pantalla de batería: elige **Sin restricciones**.
+   3. **Mostrar sobre otras apps** (opcional): la cápsula con el porcentaje junto a la cámara frontal. Si el celular no tiene recorte de cámara, sale arriba al centro. Desde Android 11 el sistema abre la lista de todas las apps: busca Mr. Bin y actívalo.
 2. En **Extraer**, elige la carpeta del `.pkg` (por defecto `Download`) y la carpeta de destino (por defecto `Download/MrBin`).
 3. Marca los PKG que dicen **fPKG** y toca **Extraer** en la barra de abajo. Mientras extrae, la tarjeta del avance, arriba, tiene **Pausar** y **Cancelar**.
 4. Al terminar, **Resultados** dice dónde quedó cada juego, cuántos archivos y bytes escribió, el tamaño y los primeros bytes de `eboot.bin`, y lo que no escribió.
@@ -108,14 +110,14 @@ El resto de la app:
 | --- | --- |
 | `engine/PkgConverterEngine.java` | Busca los `.pkg`, los extrae en lote en un hilo aparte y lleva el registro |
 | `engine/PkgModels.java` | Estado que muestran la app y la notificación |
-| `engine/SettingsStore.java` | Carpetas de origen y destino |
+| `engine/SettingsStore.java` | Carpetas de origen y destino, y si ya se pasó la pantalla del primer inicio |
 | `service/ConversionService.java` | Servicio en primer plano: notificación con avance, wake lock y cápsula junto a la cámara |
 | `service/ConversionActionReceiver.java` | Botones de la notificación (pausar/reanudar, cancelar) |
-| `ui/MainActivity.java` | Pestañas Extraer y Resultados, la página del registro y los permisos |
+| `ui/MainActivity.java` | Pestañas Extraer y Resultados, la página del registro y la de los permisos |
 | `ui/FolderPickerDialogs.java` | Selector de carpetas |
 | `ui/Palette.java` | Todos los colores de la app |
 | `ui/Texts.java` | Estados y motivos del motor en el idioma del celular |
-| `ui/Icons.java` | Íconos de la interfaz, dibujados en código (la cara de Mr. Bin sale de `res/drawable/ic_glyph.xml`) |
+| `ui/Icons.java` | Íconos de la interfaz, dibujados en código (la cara de Mr. Bin es `res/drawable-nodpi/ic_glyph.png`) |
 | `App.java` | Crea el motor y el archivo de registro, y lee la versión del APK |
 
 La app es Java sin AndroidX, Kotlin ni Gradle. Funciona desde Android 11 (API 30) y apunta a la API 34.
@@ -127,8 +129,9 @@ app/
   src/main/                  la app (AndroidManifest.xml, java/, res/)
   src/test/…/OrbisCli.java   ejecuta el motor en la computadora, sin Android
 art/
-  icon.py                    dibuja a Mr. Bin (capas del ícono adaptable, monocromo, notificación y el ícono de la app)
-  preview.sh                 lo pasa a PNG para revisarlo (art/out/)
+  source/                    el arte de Mr. Bin y la máscara que lo recorta
+  icon.py                    saca todos los íconos del arte (capas del ícono adaptable, monocromo, ícono de la app)
+  lift.swift                 vuelve a hacer esa máscara con el recorte de sujetos de macOS
 docs/icon.png                el ícono para este README
 scripts/
   build-apk.sh               compila y firma el APK
@@ -153,7 +156,7 @@ Funciona desde cualquier carpeta y deja `mrbin-X.Y.Z.apk` en `app/build/outputs/
 
 **Versión nueva:** se cambia solo en `scripts/build-apk.sh` (`VERSION_CODE` y `VERSION_NAME`). La app la lee del APK para el encabezado y el registro. `VERSION_CODE` siempre tiene que subir: Android no instala una versión menor encima de una mayor.
 
-**Ícono:** se edita en `art/icon.py` y se regenera con `python3 art/icon.py && art/preview.sh`. Los XML `res/drawable/ic_launcher_*.xml`, `ic_stat_app.xml` e `ic_glyph.xml` (la cara de Mr. Bin en la pestaña Extraer) salen de ahí y no se editan a mano.
+**Ícono:** todos los íconos salen del arte `art/source/mrbin-art.jpg`. El encuadre se cambia en `art/icon.py` y se regenera con `python3 art/icon.py` (necesita Pillow): escribe las capas `res/mipmap-*dpi/ic_launcher_*.png`, `res/drawable-nodpi/ic_glyph.png` (la cara de Mr. Bin en la pestaña Extraer), `docs/icon.png` y una vista previa en `art/out/`. Esos archivos no se editan a mano. Si cambia el arte, la máscara se vuelve a hacer con `swift art/lift.swift art/source/mrbin-art.jpg art/source/mrbin-mask.png` (macOS 14 o más nuevo). El ícono de la notificación, `res/drawable/ic_stat_app.xml`, es un dibujo de líneas que se edita a mano, porque a 24 dp el arte se vuelve una mancha.
 
 ### Firma
 

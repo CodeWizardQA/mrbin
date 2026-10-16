@@ -44,6 +44,15 @@ public final class SettingsStore {
         prefs.edit().putString("dest_dir", path).apply();
     }
 
+    /** The permissions screen of the first start stays until the user taps Continue or grants all three. */
+    public boolean isSetupDone() {
+        return prefs.getBoolean("setup_done", false);
+    }
+
+    public void setSetupDone(boolean done) {
+        prefs.edit().putBoolean("setup_done", done).apply();
+    }
+
     public boolean isNotchCapsuleEnabled() {
         return prefs.getBoolean("notch_capsule", true);
     }

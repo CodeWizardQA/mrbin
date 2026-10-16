@@ -21,6 +21,18 @@
     <string name="onb_overlay_body">Muestra el porcentaje alrededor de la cámara frontal mientras extrae.</string>
     <string name="onb_overlay_btn">Permitir mostrar sobre otras apps</string>
     <string name="onb_overlay_done">Permitido</string>
+    <string name="onb_intro">Solo el primero es obligatorio. Los otros dos son opcionales y puedes cambiar los tres después con el botón de la llave, arriba a la derecha.</string>
+    <string name="onb_storage_done">Acceso a archivos autorizado</string>
+    <string name="onb_battery_hint">Si el celular abre su propia pantalla de batería, elige «Sin restricciones».</string>
+    <string name="onb_overlay_hint">Si se abre una lista de apps, busca %1$s y actívalo.</string>
+    <string name="onb_count">%1$d de %2$d permitidos</string>
+    <string name="onb_bar_hint">Los cambias después con el botón de la llave</string>
+    <string name="onb_bar_locked">Para seguir falta el acceso a archivos</string>
+    <string name="onb_continue">Continuar</string>
+
+    <!-- Página de permisos (botón de la llave del encabezado) -->
+    <string name="perm_title">Permisos</string>
+    <string name="perm_subtitle">Da los que saltaste, cuando quieras</string>
 
     <!-- Pestaña Extraer -->
     <string name="source_label">Carpeta del PKG</string>

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Theme colors. The full palette is ui/Palette.java; keep these three equal to BG, SURFACE and ACCENT there. -->
+<!-- Theme colors. The full palette is ui/Palette.java; keep these equal to BG, SURFACE, ACCENT, TEXT and TEXT_2 there. -->
 <resources>
-    <color name="bg">#FF12100C</color>
-    <color name="surface">#FF1B1813</color>
-    <color name="accent">#FFB5E24A</color>
-    <color name="text">#FFF6F1E7</color>
-    <color name="text_2">#FFC5BBAA</color>
-    <!-- Mr. Bin's tie, only in the glyph of the Extract tab (drawable/ic_glyph.xml). -->
-    <color name="tie">#FFF0484E</color>
+    <color name="bg">#FF0B0F24</color>
+    <color name="surface">#FF131A36</color>
+    <color name="accent">#FF8DEB3F</color>
+    <color name="text">#FFF2F4FF</color>
+    <color name="text_2">#FFBCC4E6</color>
 </resources>
