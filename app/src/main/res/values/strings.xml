@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English (default). The Spanish text is in values-es/strings.xml; keep both files with the same names. -->
+<resources>
+    <string name="app_name" translatable="false">Mr. Bin</string>
+    <!-- Folder created in Download for the games by default: no space or dot, so paths stay easy to type. -->
+    <string name="app_folder" translatable="false">MrBin</string>
+
+    <!-- Header and tabs -->
+    <string name="header_subtitle">v%1$s · PS4 fPKG → game folder</string>
+    <string name="tab_extract">Extract</string>
+    <string name="tab_results">Results</string>
+    <string name="tab_results_n">Results (%1$d)</string>
+    <string name="back">Back</string>
+
+    <!-- First start: permissions -->
+    <string name="onb_subtitle">Extract a PS4 fake PKG (fPKG) into its game folder</string>
+    <string name="onb_storage_title">1. File access (required)</string>
+    <string name="onb_storage_body">%1$s reads the .pkg without changing or deleting it, and writes the game folder (eboot.bin, sce_sys, sce_module…) into the destination folder you choose.</string>
+    <string name="onb_storage_btn">Allow file access</string>
+    <string name="onb_battery_title">2. Keep going in the background (recommended)</string>
+    <string name="onb_battery_body">Stops the system from halting the extraction of a big game when the screen turns off.</string>
+    <string name="onb_battery_btn">Remove battery limit</string>
+    <string name="onb_battery_done">No battery limit</string>
+    <string name="onb_overlay_title">3. Progress next to the camera (optional)</string>
+    <string name="onb_overlay_body">Shows the percentage around the front camera while extracting.</string>
+    <string name="onb_overlay_btn">Allow display over other apps</string>
+    <string name="onb_overlay_done">Allowed</string>
+
+    <!-- Extract tab -->
+    <string name="source_label">PKG folder</string>
+    <string name="source_hint">Read only: the .pkg is never changed or deleted.</string>
+    <string name="dest_label">Extract to</string>
+    <string name="dest_hint">One folder per game, named after its ID (e.g. CUSA01623)</string>
+    <string name="free_space">%1$s free</string>
+    <string name="change">Change</string>
+    <string name="pick_source_title">Folder with the .pkg</string>
+    <string name="pick_dest_title">Destination folder</string>
+    <string name="scan_again">Refresh</string>
+    <string name="scanning">Reading…</string>
+    <string name="ready_none">No PKG selected</string>
+    <plurals name="ready_title">
+        <item quantity="one">%1$d PKG ready to extract</item>
+        <item quantity="other">%1$d PKGs ready to extract</item>
+    </plurals>
+    <string name="ready_hint_none">Check a PKG marked fPKG.</string>
+    <string name="ready_hint">%1$s → %2$s</string>
+    <string name="extract">Extract</string>
+    <string name="extracting_pct">Extracting… %1$d%%</string>
+    <string name="list_title">PKG files (%1$d)</string>
+    <string name="list_scanning">Reading the .pkg files in the folder…</string>
+    <string name="empty_title">No .pkg files in that folder</string>
+    <string name="empty_body">Choose above the folder where you downloaded the .pkg (for example Download).</string>
+    <string name="meta_version">v%1$s</string>
+    <string name="cat_game">Game</string>
+    <string name="cat_update">Update</string>
+    <string name="cat_dlc">DLC</string>
+    <string name="meta_will_write">%1$s files · %2$s → %3$s/</string>
+    <string name="detail_prefix">Detail: %1$s</string>
+    <string name="badge_store">STORE</string>
+    <string name="badge_damaged">DAMAGED</string>
+    <string name="badge_not_pkg">NOT A PKG</string>
+
+    <!-- What the engine found in each PKG -->
+    <string name="reason_ok">fPKG: can be extracted.</string>
+    <string name="reason_ps3">PS3 PKG: not supported in this version.</string>
+    <string name="reason_not_ps4">Not a PS4 PKG.</string>
+    <string name="reason_bad_header">The PKG header is damaged or the file is incomplete.</string>
+    <string name="reason_incomplete">The PKG is incomplete: the file is %1$s and its header says %2$s. Was the download cut short?</string>
+    <string name="reason_no_pfs">The PKG has no game image: there is nothing to extract.</string>
+    <string name="reason_retail">Store PKG: it is encrypted with the account\'s license and only a PS4 opens it. This app cannot extract it.</string>
+    <string name="reason_bad_content">The fPKG keys open the image key, but the decrypted content makes no sense: the PKG is damaged or is not a regular fPKG.</string>
+    <string name="reason_no_pfs_image">The PKG has no pfs_image.dat (the game image).</string>
+    <string name="reason_inner_damaged">The game image inside the PKG (pfs_image.dat) is damaged.</string>
+    <string name="reason_unreadable">The PKG could not be read.</string>
+
+    <!-- Live progress -->
+    <string name="phase_idle">Ready</string>
+    <string name="phase_reading">Reading the PKG</string>
+    <string name="phase_extracting">Extracting game files</string>
+    <string name="phase_done">Extraction finished</string>
+    <string name="phase_cancelled">Cancelled</string>
+    <string name="phase_error">Finished with errors</string>
+    <string name="paused">Paused</string>
+    <string name="item_of">%1$d of %2$d</string>
+    <string name="metric_left">Time left</string>
+    <string name="metric_speed">Speed</string>
+    <string name="metric_elapsed">Elapsed</string>
+    <string name="bytes_of">%1$s of %2$s</string>
+    <string name="files_of">%1$s / %2$s files</string>
+    <string name="current_file">Writing</string>
+    <string name="view_results">View results</string>
+    <string name="hide">Hide</string>
+    <string name="calculating">calculating…</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Status the engine reports -->
+    <string name="status_opening">Opening %1$s</string>
+    <string name="status_paused">Paused</string>
+    <string name="status_cancelled">Cancelled: the half-written folder was deleted and the original PKG was not touched.</string>
+    <string name="status_errors">There were errors. The message is in Results and the details in the log.</string>
+    <plurals name="status_done">
+        <item quantity="one">Game extracted to %1$s</item>
+        <item quantity="other">Games extracted to %1$s</item>
+    </plurals>
+    <string name="msg_cannot_read_folder">Could not read %1$s</string>
+    <string name="err_dest_not_empty">%1$s already exists and is not empty. Delete it or choose another destination folder.</string>
+    <string name="err_no_space">Not enough space: %1$s needed and %2$s free in %3$s.</string>
+
+    <!-- Results tab -->
+    <string name="results_subtitle">What %1$s wrote in this session</string>
+    <string name="results_empty_title">Nothing extracted yet</string>
+    <string name="results_empty_body">In Extract, check an fPKG and tap Extract.</string>
+    <string name="result_ok_chip">Done</string>
+    <string name="result_fail_chip">Failed</string>
+    <string name="result_game_folder">Game folder: %1$s</string>
+    <string name="result_stats">%1$d files · %2$s · %3$s</string>
+    <string name="result_eboot_self">eboot.bin: %1$s · PS4 executable (SELF), as it comes in the PKG</string>
+    <string name="result_eboot_other">eboot.bin: %1$s · starts with %2$s</string>
+    <string name="result_no_eboot">This PKG has no eboot.bin (it is not a game, or it is an update or DLC).</string>
+    <string name="result_skipped">Not written (encrypted with keys only the console has): %1$s</string>
+    <string name="result_error">Error: %1$s</string>
+    <string name="result_unknown_error">unknown</string>
+    <string name="result_fail_help">No half-written folder was left. Open the log, copy it and attach it to an issue.</string>
+    <string name="result_source_safe">The original .pkg was not touched: %1$s</string>
+    <string name="open_log">Open log</string>
+
+    <!-- Log -->
+    <string name="log_title">Log</string>
+    <string name="log_subtitle">What %1$s did, step by step (in English)</string>
+    <string name="log_copy">Copy</string>
+    <string name="log_share">Share</string>
+    <string name="log_copied">Log copied.</string>
+    <string name="log_clip_label">%1$s log</string>
+    <string name="log_share_subject">%1$s %2$s log</string>
+    <string name="log_share_chooser">Send log</string>
+    <string name="log_empty">(the log is empty)</string>
+
+    <!-- Folder picker -->
+    <string name="fp_shortcuts">Shortcuts:</string>
+    <string name="fp_new_folder_hint">New folder name</string>
+    <string name="fp_create">Create</string>
+    <string name="fp_selected">Selected path:</string>
+    <string name="fp_use">Use this folder</string>
+    <plurals name="fp_pkgs_here">
+        <item quantity="one">%1$d .pkg file here</item>
+        <item quantity="other">%1$d .pkg files here</item>
+    </plurals>
+    <string name="fp_no_subfolders">No subfolders here.</string>
+    <string name="fp_up">Up one level</string>
+    <string name="fp_new">New folder</string>
+    <string name="fp_system">Android picker</string>
+    <string name="internal_storage">Internal storage</string>
+    <string name="system_picker_unavailable">The system folder picker is not available: %1$s</string>
+
+    <!-- Notification and capsule -->
+    <string name="notif_channel_progress">Extraction in progress</string>
+    <string name="notif_channel_progress_desc">Percentage, speed and time left while extracting</string>
+    <string name="notif_channel_done">Finished extractions</string>
+    <string name="notif_starting_title">%1$s · extracting PKG</string>
+    <string name="notif_starting_text">Getting ready…</string>
+    <string name="notif_extracting">Extracting</string>
+    <string name="notif_left">%1$s left</string>
+    <string name="capsule_paused">PAUSED</string>
+</resources>
